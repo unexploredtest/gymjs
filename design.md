@@ -162,8 +162,8 @@ abstract class Env {
     protected actionSpace: Discrete;
     protected observationSpace: Box;
 
-    abstract reset(): [Box, {}];
-    abstract async step(action: number): [Box, number, boolean, boolean, {}]; // Action is number for now
+    abstract reset(): [Box, object];
+    abstract async step(action: number): [Box, number, boolean, boolean, object]; // Action is number for now
     abstract async render(): void;
     abstract close(): void;
 }
