@@ -114,7 +114,7 @@ class Discrete extends Space {
     private n: number;
     private start: number;
     
-    constructor(n: number, start: number) {
+    constructor(n: number, start: number = 0) {
         super(shape: [], dtype: "int32")
         this.n = n;
         this.start = start;
