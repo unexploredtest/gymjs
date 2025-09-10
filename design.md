@@ -165,8 +165,8 @@ abstract class Env {
     protected actionSpace: ActSpace;
     protected observationSpace: ObsSpace;
 
-    abstract reset(): [tf.Tensor, object];
-    abstract async step(action: number): [tf.Tensor, number, boolean, boolean, object]; // Action is number for now
+    abstract reset(): [tf.Tensor, {}];
+    abstract async step(action: number): [tf.Tensor, number, boolean, boolean, {}]; // Action is number for now
     abstract async render(): void;
     abstract close(): void;
 }
