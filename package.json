@@ -2,11 +2,28 @@
   "name": "gymjs",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "tsc --watch",
+    "build": "tsc",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./spaces": {
+      "types": "./dist/spaces/index.d.ts",
+      "default": "./dist/spaces/index.js"
+    },
+    "./envs/classic_control": {
+      "types": "./dist/envs/classic_control/index.d.ts",
+      "default": "./dist/envs/classic_control/index.js"
+    }
   },
   "keywords": [],
   "author": "",
