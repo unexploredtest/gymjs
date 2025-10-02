@@ -16,7 +16,7 @@ export abstract class Env<T> {
   constructor(
     actionSpace: ActSpace,
     observationSpace: ObsSpace,
-    renderMode: string
+    renderMode: string | null
   ) {
     this.actionSpace = actionSpace;
     this.observationSpace = observationSpace;
