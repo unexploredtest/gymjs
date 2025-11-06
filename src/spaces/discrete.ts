@@ -24,12 +24,16 @@ export class Discrete extends Space {
    */
   sample(): number {
     // Might be a bit too elaborate to use TF but in case we use seeds this is the way
-    let randomNumTensor = tf.randomUniformInt(
-      [1],
-      this.start,
-      this.start + this.n
-    );
-    let [randomNumber] = randomNumTensor.dataSync();
+    let randomNumber = tf.tidy(() => {
+      let randomNumTensor = tf.randomUniformInt(
+        [1],
+        this.start,
+        this.start + this.n
+      );
+      let [randomNumber] = randomNumTensor.dataSync();
+
+      return randomNumber;
+    });
 
     return randomNumber;
   }
