@@ -47,7 +47,15 @@ export class CartPoleEnv extends Env<null> {
     canvas: HTMLCanvasElement | null = null
   ) {
     let actionSpace = new Discrete(2);
-    let observationSpace = new Box(-Infinity, Infinity, [4], 'float32');
+
+    const high = tf.tensor([
+      CartPoleEnv.xThreshold * 2,
+      Infinity,
+      CartPoleEnv.thetaThresholdRadians * 2,
+      Infinity,
+    ]);
+
+    let observationSpace = new Box(tf.neg(high), high, [4], 'float32');
 
     super(actionSpace, observationSpace, renderMode);
     this.suttonBartoReward = suttonBartoReward;
