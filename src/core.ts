@@ -2,12 +2,10 @@ import * as tf from '@tensorflow/tfjs';
 
 import { Space } from './spaces/space';
 
-export type InfoType<T> = Record<string, T>;
-
 /**
  * An abstract class that represents the structure of an environment.
  */
-export abstract class Env<T> {
+export abstract class Env {
   /** The render mode of the environment */
   protected renderMode: string | null;
   /** The action space of the environment */
@@ -30,7 +28,7 @@ export abstract class Env<T> {
    *
    * @returns An array of the observation of the initial state and info
    */
-  abstract reset(): [tf.Tensor, InfoType<T> | null];
+  abstract reset(): [tf.Tensor, Record<string, any> | null];
   /**
    * Takes one step in the environment
    *
@@ -39,7 +37,7 @@ export abstract class Env<T> {
    */
   abstract step(
     action: tf.Tensor | number
-  ): Promise<[tf.Tensor, number, boolean, boolean, InfoType<T> | null]>;
+  ): Promise<[tf.Tensor, number, boolean, boolean, Record<string, any> | null]>;
   /**
    * Renders the environment graphically.
    *
@@ -51,29 +49,31 @@ export abstract class Env<T> {
    */
   abstract close(): void;
 
-  get unwrapped(): Env<T> {
+  get unwrapped(): Env {
     return this;
   }
 }
 
-export abstract class Wrapper<T> {
-  env: Env<T> | Wrapper<T>;
+export abstract class Wrapper {
+  env: Env | Wrapper;
   protected _actionSpace: Space | null;
   protected _observationSpace: Space | null;
 
-  constructor(env: Env<T> | Wrapper<T>) {
+  constructor(env: Env | Wrapper) {
     this.env = env;
     this._actionSpace = null;
     this._observationSpace = null;
   }
 
-  reset(): [tf.Tensor, InfoType<T> | null] {
+  reset(): [tf.Tensor, Record<string, any> | null] {
     return this.env.reset();
   }
 
   async step(
     action: tf.Tensor | number
-  ): Promise<[tf.Tensor, number, boolean, boolean, InfoType<T> | null]> {
+  ): Promise<
+    [tf.Tensor, number, boolean, boolean, Record<string, any> | null]
+  > {
     return this.env.step(action);
   }
 
@@ -101,24 +101,26 @@ export abstract class Wrapper<T> {
     }
   }
 
-  get unwrapped(): Env<T> | Wrapper<T> {
+  get unwrapped(): Env | Wrapper {
     return this.env.unwrapped;
   }
 }
 
-export abstract class ObservationWrapper<T> extends Wrapper<T> {
-  constructor(env: Env<T> | Wrapper<T>) {
+export abstract class ObservationWrapper extends Wrapper {
+  constructor(env: Env | Wrapper) {
     super(env);
   }
 
-  reset(): [tf.Tensor, InfoType<T> | null] {
+  reset(): [tf.Tensor, Record<string, any> | null] {
     let [obs, info] = this.env.reset();
     return [this.observarionTransform(obs), info];
   }
 
   async step(
     action: tf.Tensor | number
-  ): Promise<[tf.Tensor, number, boolean, boolean, InfoType<T> | null]> {
+  ): Promise<
+    [tf.Tensor, number, boolean, boolean, Record<string, any> | null]
+  > {
     let [obs, reward, terminated, truncated, info] =
       await this.env.step(action);
     return [
@@ -133,14 +135,16 @@ export abstract class ObservationWrapper<T> extends Wrapper<T> {
   abstract observarionTransform(obs: tf.Tensor): tf.Tensor;
 }
 
-export abstract class RewardWrapper<T> extends Wrapper<T> {
-  constructor(env: Env<T> | Wrapper<T>) {
+export abstract class RewardWrapper extends Wrapper {
+  constructor(env: Env | Wrapper) {
     super(env);
   }
 
   async step(
     action: tf.Tensor | number
-  ): Promise<[tf.Tensor, number, boolean, boolean, InfoType<T> | null]> {
+  ): Promise<
+    [tf.Tensor, number, boolean, boolean, Record<string, any> | null]
+  > {
     let [obs, reward, terminated, truncated, info] =
       await this.env.step(action);
     return [obs, this.rewardTransform(reward), terminated, truncated, info];
@@ -149,14 +153,16 @@ export abstract class RewardWrapper<T> extends Wrapper<T> {
   abstract rewardTransform(reward: number): number;
 }
 
-export abstract class ActionWrapper<T> extends Wrapper<T> {
-  constructor(env: Env<T> | Wrapper<T>) {
+export abstract class ActionWrapper extends Wrapper {
+  constructor(env: Env | Wrapper) {
     super(env);
   }
 
   async step(
     action: tf.Tensor | number
-  ): Promise<[tf.Tensor, number, boolean, boolean, InfoType<T> | null]> {
+  ): Promise<
+    [tf.Tensor, number, boolean, boolean, Record<string, any> | null]
+  > {
     action = this.actionTransform(action);
     let [obs, reward, terminated, truncated, info] =
       await this.env.step(action);

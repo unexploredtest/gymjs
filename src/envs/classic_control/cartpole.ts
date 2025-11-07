@@ -10,7 +10,7 @@ import { Env } from '../../core';
  * The Cartpole problem in reinforcement learning involves balancing a pole on a moving cart along a track, where the agent
  * must learn to keep the pole upright by choosing to move the cart left or right based on the state of the system.
  */
-export class CartPoleEnv extends Env<null> {
+export class CartPoleEnv extends Env {
   // A bunch of environment constants
   static readonly gravity = 9.8;
   static readonly massCart = 1.0;
