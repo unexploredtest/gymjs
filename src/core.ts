@@ -54,9 +54,15 @@ export abstract class Env {
   }
 }
 
+/**
+ * Wrapper around an environment, meant to change/add the behaviour or funtionality
+ */
 export abstract class Wrapper {
+  /** Environemnt to wrap */
   env: Env | Wrapper;
+  /** Substitute action space */
   protected _actionSpace: Space | null;
+  /** Substitute observation space */
   protected _observationSpace: Space | null;
 
   constructor(env: Env | Wrapper) {
@@ -65,10 +71,21 @@ export abstract class Wrapper {
     this._observationSpace = null;
   }
 
+  /**
+   * Resets the wrapper
+   *
+   * @returns An array of the observation of the initial state and info
+   */
   reset(): [tf.Tensor, Record<string, any> | null] {
     return this.env.reset();
   }
 
+  /**
+   * Takes one step in the wrapper
+   *
+   * @param action - action to take in the environment
+   * @returns A tuple of the observation of the initial state, reward, termination, truncation and info
+   */
   async step(
     action: tf.Tensor | number
   ): Promise<
@@ -77,14 +94,23 @@ export abstract class Wrapper {
     return this.env.step(action);
   }
 
+  /**
+   * Renders the wrapper graphically.
+   *
+   * @returns Either no return or an array of the screen of the environment
+   */
   async render(): Promise<void | tf.Tensor> {
     return this.env.render();
   }
-
+  /**
+   * Closes the environment.
+   */
   close(): void {
     this.env.close();
   }
-
+  /**
+   * @returns the action space of the wrapper.
+   */
   get actionSpace(): Space {
     if (this._actionSpace === null) {
       return this.env.actionSpace;
@@ -92,7 +118,9 @@ export abstract class Wrapper {
       return this._actionSpace;
     }
   }
-
+  /**
+   * @returns the observation space of the wrapper.
+   */
   get observationSpace(): Space {
     if (this._observationSpace === null) {
       return this.env.observationSpace;
@@ -101,11 +129,17 @@ export abstract class Wrapper {
     }
   }
 
+  /**
+   * @returns the unwrapped environment
+   */
   get unwrapped(): Env | Wrapper {
     return this.env.unwrapped;
   }
 }
 
+/**
+ * A specifc wrapper that only makes changes to the observation
+ */
 export abstract class ObservationWrapper extends Wrapper {
   constructor(env: Env | Wrapper) {
     super(env);
@@ -131,10 +165,18 @@ export abstract class ObservationWrapper extends Wrapper {
       info,
     ];
   }
-
+  /**
+   * Makes changes to the observation of the environment
+   *
+   * @param obs - The original observation to change
+   * @returns the transformed observation
+   */
   abstract observarionTransform(obs: tf.Tensor): tf.Tensor;
 }
 
+/**
+ * A specifc wrapper that only makes changes to the rewards
+ */
 export abstract class RewardWrapper extends Wrapper {
   constructor(env: Env | Wrapper) {
     super(env);
@@ -149,10 +191,18 @@ export abstract class RewardWrapper extends Wrapper {
       await this.env.step(action);
     return [obs, this.rewardTransform(reward), terminated, truncated, info];
   }
-
+  /**
+   * Makes changes to the rewards of the environment
+   *
+   * @param reward - The original reward to change
+   * @returns the transformed reward
+   */
   abstract rewardTransform(reward: number): number;
 }
 
+/**
+ * A specifc wrapper that only makes changes to the actions
+ */
 export abstract class ActionWrapper extends Wrapper {
   constructor(env: Env | Wrapper) {
     super(env);
@@ -168,6 +218,11 @@ export abstract class ActionWrapper extends Wrapper {
       await this.env.step(action);
     return [obs, reward, terminated, truncated, info];
   }
-
+  /**
+   * Makes changes to the actions of the environment
+   *
+   * @param action - The original action to change
+   * @returns the transformed action
+   */
   abstract actionTransform(action: tf.Tensor | number): tf.Tensor | number;
 }
