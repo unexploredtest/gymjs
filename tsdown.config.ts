@@ -6,5 +6,5 @@ export default defineConfig({
     './src/spaces/index.ts',
     './src/envs/classic_control/index.ts',
   ],
-  hash: false
+  hash: false,
 });
