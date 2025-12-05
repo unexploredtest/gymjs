@@ -1,2 +1,3 @@
 import { CartPoleEnv } from './cartpole';
-export { CartPoleEnv };
+import { PendulumEnv } from './pendulum';
+export { CartPoleEnv, PendulumEnv };
