@@ -115,7 +115,7 @@ export class PendulumEnv extends Env {
   /**
    * Takes one step in the environment.
    *
-   * @param action - The force applied, between -1 and 1. The absolute value is the strength of the force and
+   * @param action - The force applied, between -2 and 2. The absolute value is the strength of the force and
    * positive value means that the force is rightward and negative means that it's leftward.
    *
    * @returns A tuple of observation (type float32 and shape [4]), reward, terminated, truncated and info (null)
