@@ -49,7 +49,7 @@ export class TimeLimit extends Wrapper {
 }
 
 /**
- * A wrapper that places a step limit on the environment
+ * A wrapper resets the environment automatically once the environment finishes
  */
 export class Autoreset extends Wrapper {
   private autoReset: boolean;
