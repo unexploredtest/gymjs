@@ -1,6 +1,6 @@
 # Gymjs
 
-Make RL environments for JS with gymjs, gym's equivalent for Javascript.
+Gymjs is an open source JS library for developing environments for reinforcement learning by providing a standard API, similar to Python's gym, and a couple of compliant environments like Cartpole and Pendulum.
 
 ## Installation
 
@@ -10,7 +10,7 @@ npm install gymjs
 
 ## API
 
-Gymjs's API is very similar to gymnasium. Python code for running CartPole's environment:
+Gymjs's API is very similar to that of gymnasium. Python code for running CartPole's environment:
 
 ```py
 import gymnasium as gym
@@ -30,11 +30,11 @@ Equivalent gymjs code:
 
 ```ts
 import { CartPoleEnv } from 'gymjs/classic_control';
-let env = CartPoleEnv();
+const env = new CartPoleEnv();
 
 let [observation, info] = env.reset();
 for (let i = 0; i < 1000; i++) {
-  let action = env.action_space.sample();
+  let action = env.actionSpace.sample();
   let [observation, reward, terminated, truncated, info] =
     await env.step(action);
 
