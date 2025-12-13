@@ -20,4 +20,11 @@ export abstract class Space {
    * @returns A tensor or number that is acceptable in the space
    */
   abstract sample(): tf.Tensor | number;
+
+  /**
+   * Determines whether a value is in the space or not
+   *
+   * @returns A boolean that specifies if the value is in the space
+   */
+  abstract contains(x: tf.Tensor | number): boolean;
 }

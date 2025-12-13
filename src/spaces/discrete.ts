@@ -37,4 +37,23 @@ export class Discrete extends Space {
 
     return randomNumber;
   }
+
+  /**
+   * Determines whether a value is in the space or not
+   *
+   * @returns A boolean that specifies if the value is in the space
+   *
+   * @override
+   */
+  contains(x: number): boolean {
+    if (!(typeof x === 'number')) {
+      return false;
+    }
+
+    if (x >= this.start && x < this.start + this.n) {
+      return true;
+    }
+
+    return false;
+  }
 }

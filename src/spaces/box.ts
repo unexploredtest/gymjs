@@ -101,6 +101,28 @@ export class Box extends Space {
       throw new Error('Low and high should be of the same type!');
     }
   }
+
+  /**
+   * Determines whether a value is in the space or not
+   *
+   * @returns A boolean that specifies if the value is in the space
+   *
+   * @override
+   */
+  contains(x: tf.Tensor): boolean {
+    if (!(x instanceof tf.Tensor)) {
+      return false;
+    }
+
+    const inBound = x
+      .lessEqual(this.high)
+      .logicalAnd(tf.logicalNot(x.less(this.low)));
+
+    if (inBound.any().dataSync()[0]) {
+      return true;
+    }
+    return false;
+  }
 }
 
 function randomExponential(shape: number[]) {
