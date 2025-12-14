@@ -30,10 +30,11 @@ export abstract class Env {
    * Resets the environment.
    *
    * @param seed - environment's seed, undefined means no seed.
+   * @param options - additional informatiom to specify how the environment resets
    * @returns An array of the observation of the initial state and info
    */
   abstract reset(
-    seed: number | undefined
+    seed: number | undefined, options: Record<string, any> | null
   ): [tf.Tensor, Record<string, any> | null];
   /**
    * Takes one step in the environment
@@ -81,12 +82,13 @@ export abstract class Wrapper {
    * Resets the wrapper.
    *
    * @param seed - environment's seed, undefined means no seed.
+   * @param options - additional informatiom to specify how the environment resets
    * @returns An array of the observation of the initial state and info
    */
   reset(
-    seed: number | undefined = undefined
+    seed: number | undefined = undefined, options: Record<string, any> | null = null
   ): [tf.Tensor, Record<string, any> | null] {
-    return this.env.reset(seed);
+    return this.env.reset(seed, options);
   }
 
   /**
@@ -158,12 +160,13 @@ export abstract class ObservationWrapper extends Wrapper {
    * Resets the wrapper.
    *
    * @param seed - environment's seed, undefined means no seed.
+   * @param options - additional informatiom to specify how the environment resets
    * @returns An array of the observation of the initial state and info
    */
   reset(
-    seed: number | undefined = undefined
+    seed: number | undefined = undefined, options: Record<string, any> | null = null
   ): [tf.Tensor, Record<string, any> | null] {
-    let [obs, info] = this.env.reset(seed);
+    let [obs, info] = this.env.reset(seed, options);
     return [this.observarionTransform(obs), info];
   }
 
