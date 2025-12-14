@@ -23,7 +23,8 @@ export class TimeLimit extends Wrapper {
    * @returns An array of the observation of the initial state and info
    */
   reset(
-    seed: number | undefined = undefined, options: Record<string, any> | null = null
+    seed: number | undefined = undefined,
+    options: Record<string, any> | null = null
   ): [tf.Tensor, Record<string, any> | null] {
     this.elapsedSteps = 0;
     return super.reset(seed, options);
@@ -71,7 +72,8 @@ export class Autoreset extends Wrapper {
    * @returns An array of the observation of the initial state and info
    */
   reset(
-    seed: number | undefined = undefined, options: Record<string, any> | null = null
+    seed: number | undefined = undefined,
+    options: Record<string, any> | null = null
   ): [tf.Tensor, Record<string, any> | null] {
     this.autoReset = false;
     return super.reset(seed, options);

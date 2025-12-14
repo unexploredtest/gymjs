@@ -34,7 +34,8 @@ export abstract class Env {
    * @returns An array of the observation of the initial state and info
    */
   abstract reset(
-    seed: number | undefined, options: Record<string, any> | null
+    seed: number | undefined,
+    options: Record<string, any> | null
   ): [tf.Tensor, Record<string, any> | null];
   /**
    * Takes one step in the environment
@@ -86,7 +87,8 @@ export abstract class Wrapper {
    * @returns An array of the observation of the initial state and info
    */
   reset(
-    seed: number | undefined = undefined, options: Record<string, any> | null = null
+    seed: number | undefined = undefined,
+    options: Record<string, any> | null = null
   ): [tf.Tensor, Record<string, any> | null] {
     return this.env.reset(seed, options);
   }
@@ -164,7 +166,8 @@ export abstract class ObservationWrapper extends Wrapper {
    * @returns An array of the observation of the initial state and info
    */
   reset(
-    seed: number | undefined = undefined, options: Record<string, any> | null = null
+    seed: number | undefined = undefined,
+    options: Record<string, any> | null = null
   ): [tf.Tensor, Record<string, any> | null] {
     let [obs, info] = this.env.reset(seed, options);
     return [this.observarionTransform(obs), info];
