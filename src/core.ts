@@ -76,11 +76,14 @@ export abstract class Wrapper {
   protected _actionSpace: Space | null;
   /** Substitute observation space */
   protected _observationSpace: Space | null;
+  /** Substitute Rendermode */
+  private readonly _renderMode: string | null;
 
   constructor(env: Env | Wrapper) {
     this.env = env;
     this._actionSpace = null;
     this._observationSpace = null;
+    this._renderMode = null;
   }
 
   /**
@@ -151,6 +154,14 @@ export abstract class Wrapper {
    */
   get unwrapped(): Env | Wrapper {
     return this.env.unwrapped;
+  }
+
+  get renderMode(): string | null {
+    if (this._renderMode === null) {
+      return this.unwrapped.renderMode;
+    } else {
+      return this._renderMode;
+    }
   }
 }
 
