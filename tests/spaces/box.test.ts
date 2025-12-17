@@ -17,6 +17,20 @@ describe('Test Shape Errors', () => {
   });
 });
 
+describe('Test Low and High Differene Errors', () => {
+  it('Low is higher than high', () => {
+    expect(() => new Box(1, 0, [1], 'float32')).toThrow(
+      'High is lower than low!'
+    );
+  });
+
+  it('Tensor low is higher than tensor high', () => {
+    expect(() => new Box(tf.ones([1]), tf.zeros([1]), [1], 'float32')).toThrow(
+      'Not all values in high are higher than low!'
+    );
+  });
+});
+
 describe.each([
   [0, 1, [1], 'float32'],
   [tf.zeros([2]), tf.ones([2]), [2], 'float32'],
@@ -24,7 +38,7 @@ describe.each([
   [tf.tensor([-Infinity]), tf.zeros([1]), [1], 'float32'],
   [tf.zeros([1]), tf.tensor([Infinity]), [1], 'float32'],
   [0, 1, [1], 'int32'],
-  [tf.zeros([2], "int32"), tf.ones([2], "int32"), [2], 'int32'],
+  [tf.zeros([2], 'int32'), tf.ones([2], 'int32'), [2], 'int32'],
 ])(
   'Test Valid Low and High for low %i high %i shape %i dtype %i',
   (low, high, shape, dtype) => {
