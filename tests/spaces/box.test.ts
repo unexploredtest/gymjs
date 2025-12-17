@@ -20,6 +20,11 @@ describe('Test Shape Errors', () => {
 describe.each([
   [0, 1, [1], 'float32'],
   [tf.zeros([2]), tf.ones([2]), [2], 'float32'],
+  [tf.tensor([-Infinity]), tf.tensor([Infinity]), [1], 'float32'],
+  [tf.tensor([-Infinity]), tf.zeros([1]), [1], 'float32'],
+  [tf.zeros([1]), tf.tensor([Infinity]), [1], 'float32'],
+  [0, 1, [1], 'int32'],
+  [tf.zeros([2], "int32"), tf.ones([2], "int32"), [2], 'int32'],
 ])(
   'Test Valid Low and High for low %i high %i shape %i dtype %i',
   (low, high, shape, dtype) => {
