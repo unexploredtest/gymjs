@@ -63,3 +63,30 @@ describe.each([
     });
   }
 );
+
+describe('Test Equality', () => {
+  const space = new Box(0, 1, [2], 'float32');
+  it('Spaces should be equal', () => {
+    const differentSpace = new Box(0, 1, [2], 'float32');
+
+    expect.assert(space.equals(differentSpace));
+  });
+
+  it('Spaces should not be equal for different shapes', () => {
+    const differentSpace = new Box(0, 1, [3], 'float32');
+
+    expect.assert(!space.equals(differentSpace));
+  });
+
+  it('Spaces should not be equal for different dtypes', () => {
+    const differentSpace = new Box(0, 1, [2], 'int32');
+
+    expect.assert(!space.equals(differentSpace));
+  });
+
+  it('Spaces should not be equal for different low or high', () => {
+    const differentSpace = new Box(-1, 1, [2], 'float32');
+
+    expect.assert(!space.equals(differentSpace));
+  });
+});
