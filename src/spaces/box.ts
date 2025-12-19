@@ -50,12 +50,7 @@ export class Box extends Space {
    */
   sample(): tf.Tensor {
     if (typeof this.low === 'number' && typeof this.high === 'number') {
-      return tf.randomUniform(
-        this.shape,
-        this.low,
-        this.high,
-        this.dtype
-      );
+      return tf.randomUniform(this.shape, this.low, this.high, this.dtype);
     } else if (
       this.low instanceof tf.Tensor &&
       this.high instanceof tf.Tensor
@@ -92,12 +87,7 @@ export class Box extends Space {
           sample
         );
 
-        let boundedTensor = tf.randomUniform(
-          this.shape,
-          0,
-          1,
-          'float32'
-        );
+        let boundedTensor = tf.randomUniform(this.shape, 0, 1, 'float32');
         boundedTensor.print();
         boundedTensor = boundedTensor.mul(high.sub(low));
         boundedTensor = boundedTensor.add(low);
@@ -184,9 +174,7 @@ export class Box extends Space {
   }
 }
 
-function randomExponential(
-  shape: number[]
-) {
+function randomExponential(shape: number[]) {
   let randomTensor = tf.randomUniform(shape, 0, 1, 'float32');
   randomTensor = tf.neg(tf.log(randomTensor));
   return randomTensor;

@@ -12,9 +12,7 @@ class ExampleEnv extends Env {
     super(actioSpace, observationSpace, null);
   }
 
-  reset(
-    options?: Record<string, any>
-  ): [tf.Tensor, null] {
+  reset(options?: Record<string, any>): [tf.Tensor, null] {
     return [tf.tensor([0]), null];
   }
 

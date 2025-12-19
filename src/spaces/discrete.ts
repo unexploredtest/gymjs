@@ -10,10 +10,7 @@ export class Discrete extends Space {
   /** The smallest element of the space */
   public start: number;
 
-  constructor(
-    n: number,
-    start: number = 0
-  ) {
+  constructor(n: number, start: number = 0) {
     if (n <= 0) {
       throw new Error('The nummber of discrete elements must be positive!');
     }

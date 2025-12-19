@@ -11,10 +11,7 @@ export class MultiDiscrete extends Space {
   /** The smallest element of the space in each dimension */
   public start: tf.Tensor;
 
-  constructor(
-    nVec: tf.Tensor,
-    start: tf.Tensor | null = null
-  ) {
+  constructor(nVec: tf.Tensor, start: tf.Tensor | null = null) {
     super(nVec.shape, 'int32');
     this.nVec = nVec;
 

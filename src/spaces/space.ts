@@ -9,10 +9,7 @@ export abstract class Space {
   /** The datatype of the space */
   public dtype: tf.DataType;
 
-  constructor(
-    shape: number[],
-    dtype: tf.DataType
-  ) {
+  constructor(shape: number[], dtype: tf.DataType) {
     this.shape = shape;
     this.dtype = dtype;
   }
