@@ -29,8 +29,8 @@ env.close()
 Equivalent gymjs code:
 
 ```ts
-import { CartPoleEnv } from 'gymjs/classic_control';
-const env = new CartPoleEnv();
+import * as gym from 'gymjs';
+const env = new gym.envs.classic_control.CartPoleEnv();
 
 let [observation, info] = env.reset();
 for (let i = 0; i < 1000; i++) {
@@ -50,26 +50,22 @@ env.close();
 An example implementation of an environment:
 
 ```ts
-import { Env } from 'gymjs';
-import { Box } from 'gymjs/spaces';
-import { TimeLimit } from 'gymjs/wrappers';
+import * as tf from '@tensorflow/tfjs';
+import * as gym from 'gymjs';
 
 class Walker extends Env {
   agent: tf.Tensor;
   goal: tf.Tensor;
   constructor() {
-    const actionSpace = new Box(0, 1, [2], 'float32');
-    const observationSpace = new Box(0, 1, [4], 'float32');
+    const actionSpace = new gym.spaces.Box(0, 1, [2], 'float32');
+    const observationSpace = new gym.spaces.Box(0, 1, [4], 'float32');
     super(actionSpace, observationSpace, null);
 
     this.agent = tf.tensor([0, 0]);
     this.goal = tf.tensor([0, 0]);
   }
 
-  reset(
-    seed: number | undefined = undefined,
-    options: Record<string, any> | null = null
-  ): [tf.Tensor, null] {
+  reset(): [tf.Tensor, null] {
     this.agent = tf.randomUniform([2], 0, 1, 'float32');
     this.goal = tf.randomUniform([2], 0, 1, 'float32');
     const obs = this.agent.concat(this.goal);
@@ -106,7 +102,7 @@ class Walker extends Env {
 }
 
 const walker = new Walker(); // Create an instance of the environment
-const limitedWalker = new TimeLimit(walker, 30); // Automatically truncate the environment after 30 steps if the environment hasn't terminated already
+const limitedWalker = new gym.spaces.TimeLimit(walker, 30); // Automatically truncate the environment after 30 steps if the environment hasn't terminated already
 ```
 
 **Disclaimer:** The project is still in its initial stages; expect a lot of bugs. The API is subject to change.
