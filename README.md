@@ -53,7 +53,7 @@ An example implementation of an environment:
 import * as tf from '@tensorflow/tfjs';
 import * as gym from 'gymjs';
 
-class Walker extends Env {
+class Walker extends gym.Env {
   agent: tf.Tensor;
   goal: tf.Tensor;
   constructor() {
