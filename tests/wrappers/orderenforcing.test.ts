@@ -62,7 +62,6 @@ describe('Test Order Enforcing Wrapper', async () => {
     await expect(async () => await enforcedEnv.render()).not.rejects;
   });
 
-
   it('Should be able to call render before reset if specified', async () => {
     const enforcedEnv = new OrderEnforcing(new ExampleEnv(), true);
     enforcedEnv.reset();
