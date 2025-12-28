@@ -1,24 +1,25 @@
 import * as tf from '@tensorflow/tfjs';
 
-import { Space } from './spaces/space';
+import { Space, Discrete, Box, MultiDiscrete, MultiBinary } from './spaces';
 
 export type ActType = number | tf.Tensor;
 export type ObsType = tf.Tensor;
+export type SpaceType = Discrete | Box | MultiDiscrete | MultiBinary;
 
 /**
  * An abstract class that represents the structure of an environment.
  */
 export abstract class Env {
   /** The action space of the environment */
-  public actionSpace: Space;
+  public actionSpace: SpaceType;
   /** The observation space of the environment */
-  public observationSpace: Space;
+  public observationSpace: SpaceType;
   /** The render mode of the environment */
   private readonly _renderMode: string | null;
 
   constructor(
-    actionSpace: Space,
-    observationSpace: Space,
+    actionSpace: SpaceType,
+    observationSpace: SpaceType,
     renderMode: string | null
   ) {
     this.actionSpace = actionSpace;
@@ -71,9 +72,9 @@ export abstract class Wrapper {
   /** Environemnt to wrap */
   env: Env | Wrapper;
   /** Substitute action space */
-  protected _actionSpace: Space | null;
+  protected _actionSpace: SpaceType | null;
   /** Substitute observation space */
-  protected _observationSpace: Space | null;
+  protected _observationSpace: SpaceType | null;
   /** Substitute Rendermode */
   protected _renderMode: string | null;
 
@@ -123,7 +124,7 @@ export abstract class Wrapper {
   /**
    * @returns the action space of the wrapper.
    */
-  get actionSpace(): Space {
+  get actionSpace(): SpaceType {
     if (this._actionSpace === null) {
       return this.env.actionSpace;
     } else {
@@ -133,7 +134,7 @@ export abstract class Wrapper {
   /**
    * @returns the observation space of the wrapper.
    */
-  get observationSpace(): Space {
+  get observationSpace(): SpaceType {
     if (this._observationSpace === null) {
       return this.env.observationSpace;
     } else {
@@ -143,13 +144,13 @@ export abstract class Wrapper {
   /**
    * Sets the action space
    */
-  set actionSpace(space: Space) {
+  set actionSpace(space: SpaceType) {
     this._actionSpace = space;
   }
   /**
    * Sets the observation space
    */
-  set observationSpace(space: Space) {
+  set observationSpace(space: SpaceType) {
     this._observationSpace = space;
   }
   /**

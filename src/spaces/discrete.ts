@@ -1,10 +1,11 @@
 import * as tf from '@tensorflow/tfjs';
 import { Space } from './space';
+import { SpaceType } from '../core';
 
 /**
  * A space consisting of finitely many elements.
  */
-export class Discrete extends Space {
+export class Discrete extends Space<number> {
   /** The number of the discrete elements in the space */
   public n: number;
   /** The smallest element of the space */
@@ -48,7 +49,7 @@ export class Discrete extends Space {
    *
    * @override
    */
-  contains(x: number): boolean {
+  contains(x: any): boolean {
     if (!(typeof x === 'number')) {
       return false;
     }
@@ -65,7 +66,11 @@ export class Discrete extends Space {
    *
    * @returns A boolean that specifies if the two discrete are the same
    */
-  equals(other: Discrete): boolean {
+  equals(other: SpaceType): boolean {
+    if (!(other instanceof Discrete)) {
+      return false;
+    }
+
     if (this.n === other.n && this.start === other.start) {
       return true;
     } else {
