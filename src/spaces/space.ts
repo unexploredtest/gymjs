@@ -1,10 +1,10 @@
 import * as tf from '@tensorflow/tfjs';
-import { ObsType, ActType } from '../core';
+import { ObsType, ActType, SpaceType } from '../core';
 
 /**
  * An abstract class that represents the structure of a space.
  */
-export abstract class Space {
+export abstract class Space<T> {
   /** The dimensions of the space */
   public shape: number[];
   /** The datatype of the space */
@@ -20,19 +20,19 @@ export abstract class Space {
    *
    * @returns A tensor or number that is acceptable in the space
    */
-  abstract sample(): ObsType | ActType;
+  abstract sample(): T;
 
   /**
    * Determines whether a value is in the space or not
    *
    * @returns A boolean that specifies if the value is in the space
    */
-  abstract contains(x: tf.Tensor | number): boolean;
+  abstract contains(x: any): boolean;
 
   /**
    * Determines if the two spaces are the same
    *
    * @returns A boolean that specifies if the two spaces are the same
    */
-  abstract equals(other: Space): boolean;
+  abstract equals(other: SpaceType): boolean;
 }

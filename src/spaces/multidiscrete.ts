@@ -1,11 +1,12 @@
 import * as tf from '@tensorflow/tfjs';
 import { Space } from './space';
 import { checkTensors } from '../utils';
+import { SpaceType } from '../core';
 
 /**
  * MultiDiscrete is the representation of the Cartesian product of n discrete spaces
  */
-export class MultiDiscrete extends Space {
+export class MultiDiscrete extends Space<tf.Tensor> {
   /** The number of the discrete elements in each dimension of the space */
   public nVec: tf.Tensor;
   /** The smallest element of the space in each dimension */
@@ -59,7 +60,7 @@ export class MultiDiscrete extends Space {
    *
    * @override
    */
-  contains(x: tf.Tensor): boolean {
+  contains(x: any): boolean {
     // Same type
     if (!(x instanceof tf.Tensor)) {
       return false;
@@ -93,7 +94,11 @@ export class MultiDiscrete extends Space {
    *
    * @returns A boolean that specifies if the two multi discrete are the same
    */
-  equals(other: MultiDiscrete): boolean {
+  equals(other: SpaceType): boolean {
+    if(!(other instanceof MultiDiscrete)) {
+      return false;
+    }
+  
     if (
       checkTensors(this.nVec, other.nVec, true) &&
       checkTensors(this.start, other.start, true)

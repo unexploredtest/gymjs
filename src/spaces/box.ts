@@ -1,11 +1,12 @@
 import * as tf from '@tensorflow/tfjs';
 import { Space } from './space';
 import { checkTensors } from '../utils';
+import { SpaceType } from '../core';
 
 /**
  * Box is the representation of the Cartesian product of n closed intervals
  */
-export class Box extends Space {
+export class Box extends Space<tf.Tensor> {
   /** The lower bound for the value */
   public low: tf.Tensor | number;
   /** The upper bound for the value */
@@ -115,7 +116,7 @@ export class Box extends Space {
    *
    * @override
    */
-  contains(x: tf.Tensor): boolean {
+  contains(x: any): boolean {
     // Same type
     if (!(x instanceof tf.Tensor)) {
       return false;
@@ -146,7 +147,11 @@ export class Box extends Space {
    *
    * @returns A boolean that specifies if the two discrete are the same
    */
-  equals(other: Box): boolean {
+  equals(other: SpaceType): boolean {
+    if(!(other instanceof Box)) {
+      return false;
+    }
+
     if (this.dtype !== other.dtype) {
       return false;
     } else if (JSON.stringify(this.shape) !== JSON.stringify(other.shape)) {
