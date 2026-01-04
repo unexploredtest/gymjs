@@ -2,16 +2,6 @@ import * as tf from '@tensorflow/tfjs';
 
 import type { Canvas } from '@napi-rs/canvas';
 import type { Sdl } from '@kmamal/sdl';
-
-let sdl: typeof import('@kmamal/sdl') | undefined = undefined;
-let createCanvas: typeof import('@napi-rs/canvas').createCanvas | undefined =
-  undefined;
-
-if (typeof process !== 'undefined' && process.platform !== 'darwin') {
-  sdl = require('@kmamal/sdl');
-  createCanvas = require('@napi-rs/canvas').createCanvas;
-}
-
 import { Box } from '../../spaces/box';
 import { Env } from '../../core';
 
@@ -47,11 +37,17 @@ export class PendulumEnv extends Env<tf.Tensor, tf.Tensor> {
    * @param g - Gravity, 10 by default
    * @param renderMode - Specify the render mode, null means no rendering and "human" means rendering on a canvas.
    * @param canvas - Specify which canvas to render on, must be specified on web if the rendering mode is human
+   * @param sdl - sdl module to render on node js
+   * @param createCanvas - function to create canvas on node js
    */
   constructor(
     g: number = 10.0,
     renderMode: 'human' | 'rgb_array' | null = null,
-    canvas: HTMLCanvasElement | null = null
+    canvas: HTMLCanvasElement | null = null,
+    sdl: typeof import('@kmamal/sdl') | undefined = undefined,
+    createCanvas:
+      | typeof import('@napi-rs/canvas').createCanvas
+      | undefined = undefined
   ) {
     let actionSpace = new Box(
       -PendulumEnv.maxTorque,
@@ -84,20 +80,27 @@ export class PendulumEnv extends Env<tf.Tensor, tf.Tensor> {
         );
       }
 
+      if (sdl === undefined) {
+        throw Error(
+          'sdl module must be passed to the constructor for rendering in node.'
+        );
+      }
+
+      if (createCanvas === undefined) {
+        throw Error(
+          'createCanvas function must be passed to the constructor for rendering in node.'
+        );
+      }
+
       if (isNode && this.renderMode === 'human') {
-        this.window = sdl?.video.createWindow({
-          title: 'Cart Pole',
+        this.window = sdl.video.createWindow({
+          title: 'Pendulum',
           width: PendulumEnv.screenDim,
           height: PendulumEnv.screenDim,
         });
       }
 
-      if (createCanvas !== undefined) {
-        this.canvas = createCanvas(
-          PendulumEnv.screenDim,
-          PendulumEnv.screenDim
-        );
-      }
+      this.canvas = createCanvas(PendulumEnv.screenDim, PendulumEnv.screenDim);
     }
   }
 
