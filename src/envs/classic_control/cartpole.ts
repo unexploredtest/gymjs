@@ -2,16 +2,6 @@ import * as tf from '@tensorflow/tfjs';
 
 import type { Canvas } from '@napi-rs/canvas';
 import type { Sdl } from '@kmamal/sdl';
-
-let sdl: typeof import('@kmamal/sdl') | undefined = undefined;
-let createCanvas: typeof import('@napi-rs/canvas').createCanvas | undefined =
-  undefined;
-
-if (typeof process !== 'undefined' && process.platform !== 'darwin') {
-  sdl = require('@kmamal/sdl');
-  createCanvas = require('@napi-rs/canvas').createCanvas;
-}
-
 import { Discrete } from '../../spaces/discrete';
 import { Box } from '../../spaces/box';
 import { Env } from '../../core';
@@ -53,11 +43,17 @@ export class CartPoleEnv extends Env<tf.Tensor, number> {
    * @param suttonBartoReward - If `True` the reward function matches the original sutton barto implementation
    * @param renderMode - Specify the render mode, null means no rendering and "human" means rendering on a canvas.
    * @param canvas - Specify which canvas to render on, must be specified on web if the rendering mode is human
+   * @param sdl - sdl module to render on node js
+   * @param createCanvas - function to create canvas on node js
    */
   constructor(
     suttonBartoReward: boolean = false,
     renderMode: 'human' | 'rgb_array' | null = null,
-    canvas: HTMLCanvasElement | null = null
+    canvas: HTMLCanvasElement | null = null,
+    sdl: typeof import('@kmamal/sdl') | undefined = undefined,
+    createCanvas:
+      | typeof import('@napi-rs/canvas').createCanvas
+      | undefined = undefined
   ) {
     let actionSpace = new Discrete(2);
 
@@ -89,20 +85,30 @@ export class CartPoleEnv extends Env<tf.Tensor, number> {
         );
       }
 
+      if (sdl === undefined) {
+        throw Error(
+          'sdl module must be passed to the constructor for rendering in node.'
+        );
+      }
+
+      if (createCanvas === undefined) {
+        throw Error(
+          'createCanvas function must be passed to the constructor for rendering in node.'
+        );
+      }
+
       if (isNode && this.renderMode === 'human') {
-        this.window = sdl?.video.createWindow({
+        this.window = sdl.video.createWindow({
           title: 'Cart Pole',
           width: CartPoleEnv.screenWidth,
           height: CartPoleEnv.screenHeight,
         });
       }
 
-      if (createCanvas !== undefined) {
-        this.canvas = createCanvas(
-          CartPoleEnv.screenWidth,
-          CartPoleEnv.screenHeight
-        );
-      }
+      this.canvas = createCanvas(
+        CartPoleEnv.screenWidth,
+        CartPoleEnv.screenHeight
+      );
     }
   }
 
