@@ -407,10 +407,7 @@ export class PendulumEnv extends Env<tf.Tensor, tf.Tensor> {
       });
     }
 
-    this.canvas = createCanvas(
-      PendulumEnv.screenDim,
-      PendulumEnv.screenDim
-    );
+    this.canvas = createCanvas(PendulumEnv.screenDim, PendulumEnv.screenDim);
   }
 }
 
