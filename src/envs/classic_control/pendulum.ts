@@ -5,6 +5,10 @@ import type { Sdl } from '@kmamal/sdl';
 import { Box } from '../../spaces/box';
 import { Env } from '../../core';
 
+let sdl: typeof import('@kmamal/sdl') | undefined = undefined;
+let createCanvas: typeof import('@napi-rs/canvas').createCanvas | undefined =
+  undefined;
+
 /**
  * CartPole, an environment that corresponds to the version of the cart-pole problem described by Barto, Sutton, and Anderson
  * The Cartpole problem in reinforcement learning involves balancing a pole on a moving cart along a track, where the agent
@@ -30,6 +34,7 @@ export class PendulumEnv extends Env<tf.Tensor, tf.Tensor> {
   // Instance variables related to rendering
   private canvas: HTMLCanvasElement | Canvas | null;
   private window: Sdl.Video.Window | undefined;
+  private createWindowPromise: Promise<void> | null;
 
   /**
    * Creates an instance of CartPoleEnv.
@@ -37,17 +42,11 @@ export class PendulumEnv extends Env<tf.Tensor, tf.Tensor> {
    * @param g - Gravity, 10 by default
    * @param renderMode - Specify the render mode, null means no rendering and "human" means rendering on a canvas.
    * @param canvas - Specify which canvas to render on, must be specified on web if the rendering mode is human
-   * @param sdl - sdl module to render on node js
-   * @param createCanvas - function to create canvas on node js
    */
   constructor(
     g: number = 10.0,
     renderMode: 'human' | 'rgb_array' | null = null,
-    canvas: HTMLCanvasElement | null = null,
-    sdl: typeof import('@kmamal/sdl') | undefined = undefined,
-    createCanvas:
-      | typeof import('@napi-rs/canvas').createCanvas
-      | undefined = undefined
+    canvas: HTMLCanvasElement | null = null
   ) {
     let actionSpace = new Box(
       -PendulumEnv.maxTorque,
@@ -65,42 +64,19 @@ export class PendulumEnv extends Env<tf.Tensor, tf.Tensor> {
     this.state = null;
     this.lastU = null;
     this.canvas = canvas;
-    this.window = undefined;
+    this.createWindowPromise = null;
 
     const isNode = typeof process === 'object';
-    if (this.renderMode === 'human' || this.renderMode === 'rgb_array') {
-      const isMac = isNode && process.platform === 'darwin';
-      if (!isNode && canvas === null) {
-        throw Error('Canvas must be provied in rendering mode in web!');
-      }
 
-      if (isMac) {
-        throw Error(
-          'Unfortunately Rendering does not currently work on Mac OS! Disable rendering mode.'
-        );
-      }
+    if (!isNode && renderMode !== null && canvas === null) {
+      throw Error('Canvas must be provied in rendering mode in web!');
+    }
 
-      if (sdl === undefined) {
-        throw Error(
-          'sdl module must be passed to the constructor for rendering in node.'
-        );
-      }
-
-      if (createCanvas === undefined) {
-        throw Error(
-          'createCanvas function must be passed to the constructor for rendering in node.'
-        );
-      }
-
-      if (isNode && this.renderMode === 'human') {
-        this.window = sdl.video.createWindow({
-          title: 'Pendulum',
-          width: PendulumEnv.screenDim,
-          height: PendulumEnv.screenDim,
-        });
-      }
-
-      this.canvas = createCanvas(PendulumEnv.screenDim, PendulumEnv.screenDim);
+    if (
+      isNode &&
+      (this.renderMode === 'human' || this.renderMode === 'rgb_array')
+    ) {
+      this.createWindowPromise = this.createWindow();
     }
   }
 
@@ -144,6 +120,10 @@ export class PendulumEnv extends Env<tf.Tensor, tf.Tensor> {
 
     if (!this.actionSpace.contains(action)) {
       throw Error(`Action invalid`);
+    }
+
+    if (this.createWindowPromise !== null) {
+      await this.createWindowPromise;
     }
 
     let [theta, thetaDot] = this.state;
@@ -400,6 +380,34 @@ export class PendulumEnv extends Env<tf.Tensor, tf.Tensor> {
       const buffer = Buffer.from(ctx.getImageData(0, 0, width, height).data);
       this.window.render(width, height, width * 4, 'rgba32', buffer);
     }
+  }
+
+  private async createWindow() {
+    const isMac = process.platform === 'darwin';
+
+    if (isMac) {
+      throw Error(
+        'Unfortunately Rendering does not currently work on Mac OS! Disable rendering mode.'
+      );
+    }
+
+    if (sdl === undefined) {
+      sdl = await import('@kmamal/sdl');
+    }
+
+    if (createCanvas === undefined) {
+      createCanvas = (await import('@napi-rs/canvas')).createCanvas;
+    }
+
+    if (this.renderMode === 'human') {
+      this.window = sdl.video.createWindow({
+        title: 'Pendulum',
+        width: PendulumEnv.screenDim,
+        height: PendulumEnv.screenDim,
+      });
+    }
+
+    this.canvas = createCanvas(PendulumEnv.screenDim, PendulumEnv.screenDim);
   }
 }
 

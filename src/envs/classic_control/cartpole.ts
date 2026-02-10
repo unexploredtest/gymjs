@@ -6,6 +6,10 @@ import { Discrete } from '../../spaces/discrete';
 import { Box } from '../../spaces/box';
 import { Env } from '../../core';
 
+let sdl: typeof import('@kmamal/sdl') | undefined = undefined;
+let createCanvas: typeof import('@napi-rs/canvas').createCanvas | undefined =
+  undefined;
+
 /**
  * CartPole, an environment that corresponds to the version of the cart-pole problem described by Barto, Sutton, and Anderson
  * The Cartpole problem in reinforcement learning involves balancing a pole on a moving cart along a track, where the agent
@@ -36,6 +40,7 @@ export class CartPoleEnv extends Env<tf.Tensor, number> {
   // Instance variables related to rendering
   private canvas: HTMLCanvasElement | Canvas | null;
   private window: Sdl.Video.Window | undefined;
+  private createWindowPromise: Promise<void> | null;
 
   /**
    * Creates an instance of CartPoleEnv.
@@ -43,17 +48,11 @@ export class CartPoleEnv extends Env<tf.Tensor, number> {
    * @param suttonBartoReward - If `True` the reward function matches the original sutton barto implementation
    * @param renderMode - Specify the render mode, null means no rendering and "human" means rendering on a canvas.
    * @param canvas - Specify which canvas to render on, must be specified on web if the rendering mode is human
-   * @param sdl - sdl module to render on node js
-   * @param createCanvas - function to create canvas on node js
    */
   constructor(
     suttonBartoReward: boolean = false,
     renderMode: 'human' | 'rgb_array' | null = null,
-    canvas: HTMLCanvasElement | null = null,
-    sdl: typeof import('@kmamal/sdl') | undefined = undefined,
-    createCanvas:
-      | typeof import('@napi-rs/canvas').createCanvas
-      | undefined = undefined
+    canvas: HTMLCanvasElement | null = null
   ) {
     let actionSpace = new Discrete(2);
 
@@ -71,44 +70,19 @@ export class CartPoleEnv extends Env<tf.Tensor, number> {
     this.state = null;
     this.canvas = canvas;
     this.window = undefined;
+    this.createWindowPromise = null;
 
     const isNode = typeof process === 'object';
-    if (this.renderMode === 'human' || this.renderMode === 'rgb_array') {
-      const isMac = isNode && process.platform === 'darwin';
-      if (!isNode && canvas === null) {
-        throw Error('Canvas must be provied in rendering mode in web!');
-      }
 
-      if (isMac) {
-        throw Error(
-          'Unfortunately Rendering does not currently work on Mac OS! Disable rendering mode.'
-        );
-      }
+    if (!isNode && renderMode !== null && canvas === null) {
+      throw Error('Canvas must be provied in rendering mode in web!');
+    }
 
-      if (sdl === undefined) {
-        throw Error(
-          'sdl module must be passed to the constructor for rendering in node.'
-        );
-      }
-
-      if (createCanvas === undefined) {
-        throw Error(
-          'createCanvas function must be passed to the constructor for rendering in node.'
-        );
-      }
-
-      if (isNode && this.renderMode === 'human') {
-        this.window = sdl.video.createWindow({
-          title: 'Cart Pole',
-          width: CartPoleEnv.screenWidth,
-          height: CartPoleEnv.screenHeight,
-        });
-      }
-
-      this.canvas = createCanvas(
-        CartPoleEnv.screenWidth,
-        CartPoleEnv.screenHeight
-      );
+    if (
+      isNode &&
+      (this.renderMode === 'human' || this.renderMode === 'rgb_array')
+    ) {
+      this.createWindowPromise = this.createWindow();
     }
   }
 
@@ -150,6 +124,10 @@ export class CartPoleEnv extends Env<tf.Tensor, number> {
 
     if (!this.actionSpace.contains(action)) {
       throw Error(`Action invalid`);
+    }
+
+    if (this.createWindowPromise !== null) {
+      await this.createWindowPromise;
     }
 
     let [x, xDot, theta, thetaDot] = this.state;
@@ -353,5 +331,36 @@ export class CartPoleEnv extends Env<tf.Tensor, number> {
       const buffer = Buffer.from(ctx.getImageData(0, 0, width, height).data);
       this.window.render(width, height, width * 4, 'rgba32', buffer);
     }
+  }
+
+  private async createWindow() {
+    const isMac = process.platform === 'darwin';
+
+    if (isMac) {
+      throw Error(
+        'Unfortunately Rendering does not currently work on Mac OS! Disable rendering mode.'
+      );
+    }
+
+    if (sdl === undefined) {
+      sdl = await import('@kmamal/sdl');
+    }
+
+    if (createCanvas === undefined) {
+      createCanvas = (await import('@napi-rs/canvas')).createCanvas;
+    }
+
+    if (this.renderMode === 'human') {
+      this.window = sdl.video.createWindow({
+        title: 'Cart Pole',
+        width: CartPoleEnv.screenWidth,
+        height: CartPoleEnv.screenHeight,
+      });
+    }
+
+    this.canvas = createCanvas(
+      CartPoleEnv.screenWidth,
+      CartPoleEnv.screenHeight
+    );
   }
 }
