@@ -152,9 +152,10 @@ export abstract class Wrapper<
   /**
    * @returns the action space of the wrapper.
    */
-  get actionSpace(): Space<WrapperActType> | Space<ActType> {
+  get actionSpace(): Space<WrapperActType> {
+    // TODO: fix ...as unknown as...
     if (this._actionSpace === undefined) {
-      return this.env.actionSpace;
+      return this.env.actionSpace as unknown as Space<WrapperActType>;
     } else {
       return this._actionSpace;
     }
@@ -162,9 +163,10 @@ export abstract class Wrapper<
   /**
    * @returns the observation space of the wrapper.
    */
-  get observationSpace(): Space<WrapperObsType> | Space<ObsType> {
+  get observationSpace(): Space<WrapperObsType> {
+    // TODO: fix ...as unknown as...
     if (this._observationSpace === undefined) {
-      return this.env.observationSpace;
+      return this.env.observationSpace as unknown as Space<WrapperObsType>;
     } else {
       return this._observationSpace;
     }
