@@ -1,5 +1,5 @@
 {
-  "name": "gymjs",
+  "name": "@unexploredtest/gymjs",
   "version": "0.1.0",
   "description": "An API standard for single-agent reinforcement learning environments",
   "scripts": {
