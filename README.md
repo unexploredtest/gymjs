@@ -5,7 +5,7 @@ Gymjs is an open source JS library for developing environments for reinforcement
 ## Installation
 
 ```bash
-npm install gymjs
+npm install @unexploredtest/gymjs
 ```
 
 ## API
